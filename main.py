@@ -14,7 +14,7 @@ async def on_message(msg):
     if msg.author.id == client.user.id:
         return
 
-    await message_handler.on_message(msg)
+    await message_handler.on_message(msg, client)
 
 
 @client.event
