@@ -15,6 +15,7 @@ time_formats = {
 
 }
 
+
 def extract_time_shortcuts(text: str):
     time_periods_found = {value: 0 for value in time_periods.values()}
     new_msg = []
