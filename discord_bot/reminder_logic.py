@@ -1,19 +1,4 @@
-import discord, re, datetime
-
-time_periods = {
-    'year': 'y',
-    'month': 'm',
-    'week': 'w',
-    'day': 'd',
-    'hour': 'h',
-    'minute': 'min',
-    'second': 's'
-}
-
-time_formats = {
-
-}
-
+import discord, re
 
 
 async def create_new_reminder(msg: discord.Message, bot_mention: str):
