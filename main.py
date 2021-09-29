@@ -19,7 +19,7 @@ async def on_message(msg):
 
 @client.event
 async def on_ready():
-    await start_discord_bot.on_ready()
+    await start_discord_bot.on_ready(client)
     await start_reminder_loop.on_ready()
 
 
