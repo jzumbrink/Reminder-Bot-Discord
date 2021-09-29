@@ -11,11 +11,5 @@ class Reminder(Base):
     remind_time = Column(DATETIME)
     creation_time = Column(DATETIME)
     reminded = Column(Boolean)
-    discord_data_id = Column(Integer)
-
-
-class ReminderDiscordData(Base):
-    __tablename__ = 'reminder_discord_data'
-    reminder_id = Column(Integer, primary_key=True)
     author_id = Column(Integer)
     channel_id = Column(Integer)
