@@ -1,27 +1,33 @@
 # Use file to initialise the data base
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy import Table, Column, Integer, DATETIME, String, Boolean
+from sqlalchemy import create_engine
+from sqlalchemy import Column, Integer, DATETIME, String, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 engine = create_engine('sqlite:///db.sqlite', echo=True)
 
-meta = MetaData()
+Base = declarative_base()
 
-reminders = Table(
-    'reminders', meta,
-    Column('id', Integer, primary_key=True),
-    Column('remind_time', DATETIME),
-    Column('creation_time', DATETIME),
-    Column('remind_msg', String),
-    Column('completed', Boolean),
-    Column('reminded', Boolean),
-    Column('discord_data_id', Integer)
-)
 
-reminders_dc_data = Table(
-    'reminders_discord_specific_data', meta,
-    Column('id', Integer, primary_key=True),
-    Column('user_id', Integer),
-    Column('channel_id', Integer)
-)
+class Reminder(Base):
+    __tablename__ = 'reminders'
 
-meta.create_all(engine)
+    id = Column(Integer, primary_key=True)
+    remind_time = Column(DATETIME)
+    creation_time = Column(DATETIME)
+    remind_msg = Column(String)
+    reminded = Column(Boolean)
+    completed = Column(Boolean)
+    discord_data_id = Column(Integer)
+
+
+class ReminderDiscordData(Base):
+    __tablename__ = 'reminders_dc_data'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
+    channel_id = Column(Integer)
+
+
+Base.metadata.create_all(engine)
+
