@@ -1,7 +1,6 @@
 import discord, json
 
 from discord_bot import message_handler, start_discord_bot
-from discord_reminder_loop import start_reminder_loop
 
 client = discord.Client()
 
@@ -20,9 +19,6 @@ async def on_message(msg):
 @client.event
 async def on_ready():
     await start_discord_bot.on_ready(client)
-    await start_reminder_loop.on_ready()
 
 
 client.run(config_dc['discord-token'])
-
-print(23)
