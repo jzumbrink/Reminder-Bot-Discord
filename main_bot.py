@@ -18,6 +18,7 @@ async def on_message(msg):
 
 @client.event
 async def on_ready():
+
     await start_discord_bot.on_ready(client)
 
 

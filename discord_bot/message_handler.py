@@ -2,8 +2,10 @@ import discord, json
 from .commands_structure import get_command_name_and_args
 from .reminder_logic import create_new_reminder
 
+
 async def send_error_message(channel: discord.TextChannel, message: str):
     await channel.send(message)
+
 
 def text_starts_with_command_prefixes(text: str) -> bool:
     for prefix in config_dc['command-prefixes']:

@@ -1,4 +1,4 @@
-from sqlalchemy import insert, create_engine, select
+from sqlalchemy import insert, create_engine, select, not_, and_
 from sqlalchemy.orm import sessionmaker
 from .models import Reminder
 import datetime
@@ -30,10 +30,8 @@ def add_reminder(remind_msg: str, remind_time, msg: discord.Message) -> bool:
 
 
 def get_all_open_reminders():
-    print("was")
+    return session.query(Reminder).filter(and_(Reminder.remind_time < datetime.datetime.now(), not_(Reminder.reminded)))
 
-    result = session.execute(
-        select(Reminder)#.where(Reminder.remind_time < datetime.datetime.now() and not Reminder.reminded)
-    )
 
-    print()
+def commit_session():
+    session.commit()

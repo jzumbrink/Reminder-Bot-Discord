@@ -3,10 +3,10 @@ import time
 import discord
 
 from data.database_operations import get_all_open_reminders
+from .existent_reminder_manager import remind
 
 
-async def reminder_loop():
-    print("wtf")
+async def reminder_loop(client: discord.Client):
     t1 = time.time()
 
     while True:
@@ -14,8 +14,10 @@ async def reminder_loop():
         open_reminders = get_all_open_reminders()
         print("Hi")
         print(open_reminders)
-
-        time.sleep(3)
+        for open_reminder in open_reminders:
+            print(open_reminder.id, open_reminder.author_id)
+            await remind(client, open_reminder)
+        time.sleep(0.2)
 
 
 async def on_ready(client: discord.Client):
@@ -26,7 +28,7 @@ async def on_ready(client: discord.Client):
 
     while True:
         try:
-            await reminder_loop()
+            await reminder_loop(client)
         except:
             # con error
             time.sleep(3)

@@ -1,5 +1,7 @@
 import datetime
+
 from dateutil.relativedelta import relativedelta
+from .time_formats import *
 
 time_periods = {
     'year': 'y',
@@ -9,10 +11,6 @@ time_periods = {
     'hour': 'h',
     'minute': 'min',
     'second': 's'
-}
-
-time_formats = {
-
 }
 
 
@@ -45,4 +43,9 @@ def add_time_shortcuts_to_datetime(time_shortcuts: dict, given_datetime: datetim
 def add_time_shortcuts_to_now(time_shortcuts: dict):
     return add_time_shortcuts_to_datetime(time_shortcuts, datetime.datetime.now())
 
-print(add_time_shortcuts_to_now(extract_time_shortcuts("1w dsanjdfj dfdkjnfdn34w 45min 3d 23y 3w 3m")[1]))
+
+def extract_explizit_time_specification(text: str) -> datetime.datetime:
+    new_datetime = datetime.datetime.now()
+    for time_format in []:  # TODO use real time formats
+        date_time_objects = re.findall(time_format, text)
+        re.sub(time_format, '', text)
