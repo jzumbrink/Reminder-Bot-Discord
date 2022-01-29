@@ -17,7 +17,7 @@ async def reminder_loop(client: discord.Client):
         for open_reminder in open_reminders:
             print(open_reminder.id, open_reminder.author_id)
             await remind(client, open_reminder)
-        time.sleep(0.2)
+        time.sleep(2)
 
 
 async def on_ready(client: discord.Client):

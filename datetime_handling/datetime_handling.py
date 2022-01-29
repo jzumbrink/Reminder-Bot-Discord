@@ -44,8 +44,14 @@ def add_time_shortcuts_to_now(time_shortcuts: dict):
     return add_time_shortcuts_to_datetime(time_shortcuts, datetime.datetime.now())
 
 
-def extract_explizit_time_specification(text: str) -> datetime.datetime:
+def extract_explizit_time_specification(text: str) -> list:
     new_datetime = datetime.datetime.now()
-    for time_format in []:  # TODO use real time formats
-        date_time_objects = re.findall(time_format, text)
-        re.sub(time_format, '', text)
+    for time_format_class in date_time_formats:  # TODO use real time formats
+        for time_format in time_format_class:
+            found_values = re.findall(time_format[0], text)
+            if len(found_values) > 0:
+                text = re.sub(time_format[0], '', text)
+                new_datetime = time_format[1](new_datetime, found_values[0])
+                break
+
+    return text, new_datetime
