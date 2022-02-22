@@ -33,5 +33,9 @@ def get_all_open_reminders():
     return session.query(Reminder).filter(and_(Reminder.remind_time < datetime.datetime.now(), not_(Reminder.reminded)))
 
 
+def get_all_open_reminders_by_author(author_id: int):
+    return session.query(Reminder).filter(and_(and_(Reminder.remind_time < datetime.datetime.now(), not_(Reminder.reminded)), Reminder.author_id == author_id))
+
+
 def commit_session():
     session.commit()

@@ -1,5 +1,7 @@
 import discord, json
-from .commands_structure import get_command_name_and_args
+from .commands_structure import CommandTypes
+from .commands import root
+from .pattern import is_pattern_valid
 from .reminder_logic import create_new_reminder
 
 
@@ -31,8 +33,25 @@ def is_bot_mentioned(client: discord.Client, text: str) -> bool:
 with open('discord_config.json', 'r') as config_dc_file:
     config_dc = json.loads(config_dc_file.read())
 
-with open('discord_bot/error_messages.json', 'r') as error_msg_file:
-    error_msg = json.loads(error_msg_file.read())
+
+def get_command_name_and_args(msg_content: str):
+    possible_commands = [root]
+
+    while len(possible_commands) > 0:
+        # search for the command
+        current_command = possible_commands.pop(0)
+
+        if current_command.type == CommandTypes.collection:
+            possible_commands += current_command.childs
+        elif current_command.type == CommandTypes.single_command:
+            result_args = is_pattern_valid(current_command, msg_content)
+            if result_args is not None:
+                return {
+                    'command': current_command,
+                    'args': result_args
+                }
+        else:
+            raise TypeError
 
 
 async def on_message(msg: discord.Message, client: discord.Client):
@@ -42,8 +61,8 @@ async def on_message(msg: discord.Message, client: discord.Client):
         if command_and_args is None:
             await send_error_message(msg.channel, "Wrong command usage")
         else:
-            # TODO Command ausführen
-            print()
+            # Execute command and provide args
+            await command_and_args['command'].execute(msg, command_and_args['args'])
     else:
         if is_bot_mentioned(client, msg.content):
             await create_new_reminder(msg, get_bot_mention(client))

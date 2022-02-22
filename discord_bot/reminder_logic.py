@@ -1,5 +1,5 @@
 import discord, re
-from datetime_handling.datetime_handling import extract_time_shortcuts, add_time_shortcuts_to_now, extract_explizit_time_specification, add_time_shortcuts_to_datetime
+from datetime_handling.datetime_handling import extract_time_shortcuts, extract_explizit_time_specification, add_time_shortcuts_to_datetime
 
 from data.database_operations import add_reminder
 

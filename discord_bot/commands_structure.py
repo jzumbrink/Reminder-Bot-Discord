@@ -1,7 +1,5 @@
-import enum
+import enum, discord
 from abc import ABC
-
-from .pattern import is_pattern_valid
 
 
 class CommandTypes(enum.Enum):
@@ -44,9 +42,9 @@ class SingleCommand(Command):
         self.func = func
         self.allowed_args = allowed_args
 
-    def execute(self, arguments):
+    async def execute(self, msg: discord.Message, arguments: dict):
         if self.func is not None:
-            self.func(arguments)
+            await self.func(msg, arguments)
         else:
             raise RuntimeError
 
@@ -79,55 +77,3 @@ class CommandArgument:
                     return self.create_specific_arg_list(text_split.pop(i))
                 return self.create_specific_arg_list()
         return None
-
-
-root = CommandCollection(
-    name="root-collection",
-    pattern="#"
-)
-
-edit_cmd = SingleCommand(
-    name="edit",
-    pattern="edit <id>",
-    func=None,
-    allowed_args=[
-        CommandArgument(
-            name="time",
-            short_arg='t',
-            long_arg="time",
-        ),
-        CommandArgument(
-            name="message",
-            short_arg='m',
-            long_arg="message",
-        ),
-    ]
-)
-
-help_cmd = SingleCommand(
-    name="help",
-    pattern="help",
-    func=lambda x: print("Hi from help for sure"),
-)
-
-root.add_child(edit_cmd)
-
-
-def get_command_name_and_args(msg_content: str):
-    possible_commands = [root]
-
-    while len(possible_commands) > 0:
-        # search for the command
-        current_command = possible_commands.pop(0)
-
-        if current_command.type == CommandTypes.collection:
-            possible_commands += current_command.childs
-        elif current_command.type == CommandTypes.single_command:
-            result = is_pattern_valid(current_command, msg_content)
-            if result is not None:
-                return {
-                    'name': current_command.name,
-                    'args': result
-                }
-        else:
-            raise TypeError
