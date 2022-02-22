@@ -43,7 +43,7 @@ async def on_message(msg: discord.Message, client: discord.Client):
             await send_error_message(msg.channel, "Wrong command usage")
         else:
             # TODO Command ausführen
-            pass
+            print()
     else:
         if is_bot_mentioned(client, msg.content):
             await create_new_reminder(msg, get_bot_mention(client))

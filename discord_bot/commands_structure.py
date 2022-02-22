@@ -1,11 +1,12 @@
 import enum
 from abc import ABC
+
 from .pattern import is_pattern_valid
 
 
 class CommandTypes(enum.Enum):
-    clt = 0
-    cmd = 1
+    collection = 0
+    single_command = 1
 
 
 class Command(ABC):
@@ -17,11 +18,11 @@ class Command(ABC):
 class CommandCollection(Command):
     childs: list
 
-    def __init__(self, name, pattern):
+    def __init__(self, name: str, pattern: str):
         self.name = name
         self.pattern = pattern
         self.childs = []
-        self.type = CommandTypes.clt
+        self.type = CommandTypes.collection
 
     def add_child(self, command: Command):
         self.childs.append(command)
@@ -33,10 +34,51 @@ class CommandCollection(Command):
 
 class SingleCommand(Command):
 
-    def __init__(self, name, pattern):
+    def __init__(self, name: str, pattern: str, func, allowed_args: list = []):
         self.name = name
         self.pattern = pattern
-        self.type = CommandTypes.cmd
+        pattern_split = self.pattern.split(' ')
+        self.keyword = pattern_split[0]
+        self.count_aparams = len(pattern_split) - 1
+        self.type = CommandTypes.single_command
+        self.func = func
+        self.allowed_args = allowed_args
+
+    def execute(self, arguments):
+        if self.func is not None:
+            self.func(arguments)
+        else:
+            raise RuntimeError
+
+
+class CommandArgument:
+
+    def __init__(self, name: str, short_arg: str, long_arg: str, expect_value: bool = True):
+        self.name = name
+        self.short_arg = '-' + short_arg if short_arg is not None else None
+        self.long_arg = '--' + long_arg if long_arg is not None else None
+        self.expect_value = expect_value
+        self.type_check_func = lambda value: True
+
+    def set_type_check_fund(self, type_check_func):
+        # TODO support for type check fund
+        self.type_check_func = type_check_func
+
+    def check_if_value_provided(self, i: int, text_split: list) -> bool:
+        return not self.expect_value or i+1 < len(text_split) and self.type_check_func(text_split[i+1])
+
+    def create_specific_arg_list(self, value=None) -> list:
+        return [self.name, value]
+
+    def extract_argument_from_text(self, text_split: list) -> list:
+        for i in range(len(text_split)):
+            if (self.short_arg is not None and text_split[i] == self.short_arg
+                    or self.long_arg is not None and text_split[i] == self.long_arg) and self.check_if_value_provided(i, text_split):
+                text_split.pop(i)
+                if self.expect_value:
+                    return self.create_specific_arg_list(text_split.pop(i))
+                return self.create_specific_arg_list()
+        return None
 
 
 root = CommandCollection(
@@ -44,26 +86,31 @@ root = CommandCollection(
     pattern="#"
 )
 
-edit_collection = CommandCollection(
-    name="edit-collection",
-    pattern="edit <id> #"
+edit_cmd = SingleCommand(
+    name="edit",
+    pattern="edit <id>",
+    func=None,
+    allowed_args=[
+        CommandArgument(
+            name="time",
+            short_arg='t',
+            long_arg="time",
+        ),
+        CommandArgument(
+            name="message",
+            short_arg='m',
+            long_arg="message",
+        ),
+    ]
 )
 
-edit_r_time_cmd = SingleCommand(
-    name="edit-remind-time",
-    pattern="edit <id> -t"
+help_cmd = SingleCommand(
+    name="help",
+    pattern="help",
+    func=lambda x: print("Hi from help for sure"),
 )
 
-edit_message_cmd = SingleCommand(
-    name="edit-message",
-    pattern="edit <id> -m"
-)
-
-edit_collection.add_childs(edit_r_time_cmd, edit_message_cmd)
-
-root.add_child(edit_collection)
-
-print()
+root.add_child(edit_cmd)
 
 
 def get_command_name_and_args(msg_content: str):
@@ -73,10 +120,10 @@ def get_command_name_and_args(msg_content: str):
         # search for the command
         current_command = possible_commands.pop(0)
 
-        if current_command.type == CommandTypes.clt:
+        if current_command.type == CommandTypes.collection:
             possible_commands += current_command.childs
-        elif current_command.type == CommandTypes.cmd:
-            result = is_pattern_valid(current_command.pattern, msg_content)
+        elif current_command.type == CommandTypes.single_command:
+            result = is_pattern_valid(current_command, msg_content)
             if result is not None:
                 return {
                     'name': current_command.name,
@@ -84,4 +131,3 @@ def get_command_name_and_args(msg_content: str):
                 }
         else:
             raise TypeError
-
