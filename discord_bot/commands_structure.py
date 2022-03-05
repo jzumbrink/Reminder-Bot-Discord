@@ -44,6 +44,17 @@ class SingleCommand(Command):
 
     async def execute(self, msg: discord.Message, arguments: dict):
         if self.func is not None:
+            """
+            Strucutre of arguments:
+            {
+                "aparams": [param0, param1, ...],
+                "kparams": {
+                    "paramX": "valueX",
+                    "paramY": "valueY",
+                    ...
+                }
+            }
+            """
             await self.func(msg, arguments)
         else:
             raise RuntimeError

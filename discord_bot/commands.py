@@ -36,6 +36,13 @@ list_reminders_cmd = SingleCommand(
     func=list_reminders,
 )
 
+details_reminder_cmd = SingleCommand(
+    name="details",
+    pattern="details <id>",
+    func=details_reminder,
+)
+
 root.add_child(edit_cmd)
 root.add_child(help_cmd)
 root.add_child(list_reminders_cmd)
+root.add_child(details_reminder_cmd)

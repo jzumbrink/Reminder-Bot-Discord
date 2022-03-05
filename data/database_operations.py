@@ -1,4 +1,4 @@
-from sqlalchemy import insert, create_engine, select, not_, and_
+from sqlalchemy import insert, create_engine, select, not_, and_, desc
 from sqlalchemy.orm import sessionmaker
 from .models import Reminder
 import datetime
@@ -34,7 +34,11 @@ def get_all_open_reminders():
 
 
 def get_all_open_reminders_by_author(author_id: int):
-    return session.query(Reminder).filter(and_(and_(Reminder.remind_time < datetime.datetime.now(), not_(Reminder.reminded)), Reminder.author_id == author_id))
+    return session.query(Reminder).filter(and_(not_(Reminder.reminded), Reminder.author_id == author_id)).order_by(Reminder.remind_time)
+
+
+def get_reminder_by_user_specific_id(user_specific_id: int):
+    pass
 
 
 def commit_session():
